@@ -1,6 +1,7 @@
 package com.fastcampus.javaallinone.project3.mycontact.repository;
 
 import com.fastcampus.javaallinone.project3.mycontact.domain.Person;
+import com.fastcampus.javaallinone.project3.mycontact.domain.dto.Birthday;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,14 +41,14 @@ class PersonRepositoryTest {
 
     @Test
     public void allArgsConstructor(){
-        Person person = new Person(1L,"Martin",20,"Soccer","A","Seoul",LocalDate.of(2020,1,1));
+       // Person person = new Person(1L,"Martin",20,"Soccer","A","Seoul",LocalDate.of(2020,1,1),"01046470435");
 
     }
 
     @Test
     public void hashCodeAndEquals(){
-        Person person1 = new Person("martin", 10);
-        Person person2 = new Person("martin", 10);
+        Person person1 = new Person("martin", 10, "A");
+        Person person2 = new Person("martin", 10,"A");
 
         System.out.println(person1.equals(person2));
         System.out.println(person1.hashCode());
@@ -58,5 +59,42 @@ class PersonRepositoryTest {
 
         System.out.println(map);
         System.out.println(map.get(person2));
+    }
+
+    @Test
+    public void findByBloodType(){
+        givenPerson("martin",10,"A");
+        givenPerson("Daniel",14,"B");
+        givenPerson("Sophie",13,"O");
+        givenPerson("Tons",12,"A");
+
+        List<Person> result = personRepository.findByBloodType("A");
+
+        result.forEach(System.out::println);
+
+    }
+
+   // private void givenPerson(String name, int age, String bloodType){
+   //     personRepository.save(new Person(name, age, bloodType));
+   // }
+
+    @Test
+    public void findByBirthday(){
+        givenPerson("martin",10,"A",LocalDate.of(1991,8,11));
+        givenPerson("Daniel",14,"B",LocalDate.of(1990,11,11));
+        givenPerson("Sophie",13,"O",LocalDate.of(1999,7,12));
+        givenPerson("Tons",12,"A",LocalDate.of(1993,8,21));
+
+        List<Person> result = personRepository.findByMonthOfBirthday(8,11);
+
+        result.forEach(System.out::println);
+    }
+    private void givenPerson(String name, int age, String bloodType){
+        Person person = new Person(name, age, bloodType);
+    }
+    private void givenPerson(String name, int age, String bloodType, LocalDate birthday){
+        Person person = new Person(name, age, bloodType);
+        person.setBirthday(new Birthday(birthday));
+        personRepository.save(person);
     }
 }
