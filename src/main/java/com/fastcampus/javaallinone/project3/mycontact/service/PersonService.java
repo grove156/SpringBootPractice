@@ -26,8 +26,8 @@ public class PersonService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Person> getPerson(Long id){
-        Optional<Person> person = personRepository.findById(id);
+    public Person getPerson(Long id){
+        Person person = personRepository.getOne(id);
 
         log.info("person : {}",person);
 
