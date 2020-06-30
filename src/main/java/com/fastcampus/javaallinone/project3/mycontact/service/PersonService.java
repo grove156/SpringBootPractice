@@ -1,6 +1,8 @@
 package com.fastcampus.javaallinone.project3.mycontact.service;
 
+import com.fastcampus.javaallinone.project3.mycontact.controller.dto.PersonDto;
 import com.fastcampus.javaallinone.project3.mycontact.domain.Person;
+import com.fastcampus.javaallinone.project3.mycontact.domain.dto.Birthday;
 import com.fastcampus.javaallinone.project3.mycontact.repository.BlockRepository;
 import com.fastcampus.javaallinone.project3.mycontact.repository.PersonRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +29,7 @@ public class PersonService {
 
     @Transactional(readOnly = true)
     public Person getPerson(Long id){
-        Person person = personRepository.getOne(id);
+        Person person = personRepository.findById(id).orElse(null);
 
         log.info("person : {}",person);
 
@@ -36,5 +38,43 @@ public class PersonService {
 
     public List<Person> getPeopleByName(String name) {
         return personRepository.findByName(name);
+    }
+
+    @Transactional
+    public void put(Person person){
+        personRepository.save(person);
+    }
+
+    @Transactional
+    public void modify(Long id, PersonDto personDto) {
+        Person person = personRepository.findById(id).orElseThrow(() -> new RuntimeException("There is no ID "+id));
+
+        if(!person.getName().equals(personDto.getName())){
+            throw new RuntimeException("Name is wrong");
+        }
+
+        person.set(personDto);
+
+        personRepository.save(person);
+    }
+
+    @Transactional
+    public void modify(Long id, String name){
+        Person person = personRepository.findById(id).orElseThrow(() -> new RuntimeException("There is no ID "+id));
+
+        person.setName(name);
+
+        personRepository.save(person);
+
+
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        Person person = personRepository.findById(id).orElseThrow(()-> new RuntimeException("NO ID found"));
+
+        person.setDeleted(true);
+
+        personRepository.save(person);
     }
 }
