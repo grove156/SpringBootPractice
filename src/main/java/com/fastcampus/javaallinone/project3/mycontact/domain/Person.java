@@ -31,16 +31,7 @@ public class Person {
     @NotEmpty
     private String name;
 
-    @NonNull
-    @Min(1)
-    private int age;
-
     private String hobby;
-
-    @Column(nullable = false)
-    @NotEmpty
-    @NonNull
-    private String bloodType;
 
     private String address;
 
@@ -48,35 +39,38 @@ public class Person {
     @Embedded
     private Birthday birthday;
 
-    @ToString.Exclude
     private String phoneNumber;
 
     @ColumnDefault("0")
     private boolean deleted;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.ALL}, orphanRemoval = true)
-    private Block block;
-
     public void set(PersonDto personDto){
-        if(personDto.getAge() !=0){
-            this.setAge(personDto.getAge());
-        }
-
         if(!StringUtils.isEmpty(personDto.getHobby())){
             this.setHobby(personDto.getHobby());
         }
 
-        if(!StringUtils.isEmpty(personDto.getBloodType())){
-            this.setBloodType(personDto.getBloodType());
-        }
-
         if(!StringUtils.isEmpty(personDto.getAddress())){
-            this.setBloodType(personDto.getAddress());
+            this.setAddress(personDto.getAddress());
         }
 
         if(!StringUtils.isEmpty(personDto.getPhoneNumber())){
-            this.setBloodType(personDto.getPhoneNumber());
+            this.setPhoneNumber(personDto.getPhoneNumber());
         }
 
+        if(personDto.getBirthday() != null){
+            this.setBirthday(Birthday.of(personDto.getBirthday()));
+        }
+    }
+
+    public Integer getAge(){
+        if(this.birthday !=null){
+            return LocalDate.now().getYear() - this.birthday.getYearOfBirthday() + 1;
+        }else{
+            return null;
+        }
+    }
+
+    public boolean isBirthdayToday(){
+        return LocalDate.now().equals(LocalDate.of(this.birthday.getYearOfBirthday(),this.birthday.getMonthOfBirthday(),this.birthday.getDayOfBirthday()));
     }
 }

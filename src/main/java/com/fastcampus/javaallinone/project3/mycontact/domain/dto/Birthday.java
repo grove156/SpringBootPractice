@@ -13,15 +13,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Data
 public class Birthday {
-
     private Integer yearOfBirthday;
-
-    @Min(1)
-    @Max(12)
     private Integer monthOfBirthday;
-
-    @Min(1)
-    @Max(31)
     private Integer dayOfBirthday;
 
     public Birthday(LocalDate birthday){
@@ -30,4 +23,15 @@ public class Birthday {
         this.dayOfBirthday = birthday.getDayOfMonth();
     }
 
+    public int getAge(){
+        return LocalDate.now().getYear() - this.yearOfBirthday + 1;
+    }
+
+    public boolean isBirthdayToday(){
+        return LocalDate.now().equals(LocalDate.of(yearOfBirthday,monthOfBirthday,dayOfBirthday));
+    }
+
+    public static Birthday of(LocalDate birthday){
+        return new Birthday(birthday);
+    }
 }
