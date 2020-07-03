@@ -25,6 +25,7 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.h2.value.ValueInt.get;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -56,11 +57,25 @@ class PersonControllerTest {
     }
 
     @Test
+    public void getAll() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/person"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.totalElements").value(6))
+                .andExpect(jsonPath("$.content.[0].name").value("martin"))
+                .andExpect(jsonPath("$.content.[1].name").value("david"))
+                .andExpect(jsonPath("$.content.[2].name").value("dennis"))
+                .andExpect(jsonPath("$.content.[3].name").value("sophie"))
+                .andExpect(jsonPath("$.content.[4].name").value("benny"))
+                .andExpect(jsonPath("$.content.[5].name").value("tony"));
+    }
+
+    @Test
     public void getPerson() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/person/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("martin"))
                 .andExpect(jsonPath("$.hobby").isEmpty())
                 .andExpect(jsonPath("$.address").isEmpty())
                 .andExpect(jsonPath("$.birthday").value("1991-08-15"))
@@ -99,8 +114,37 @@ class PersonControllerTest {
                 MockMvcRequestBuilders.post("/api/person")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(toJsonString(dto)))
-        .andExpect(jsonPath("$.code").value(500))
-        .andExpect(jsonPath("$.message").value("Unknown Error occured"));
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value(400))
+        .andExpect(jsonPath("$.message").value("Name is required field"));
+    }
+
+    @Test
+    public void postIfNameisEmpty() throws Exception{
+        PersonDto dto = new PersonDto();
+        dto.setName("");
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/person")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(toJsonString(dto)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value(400))
+        .andExpect(jsonPath("$.message").value("Name is required field"));
+    }
+
+    @Test
+    public void postPersonIfNameIsBlank() throws Exception{
+        PersonDto dto = new PersonDto();
+        dto.setName(" ");
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/person")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(toJsonString(dto)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value(400))
+        .andExpect(jsonPath("$.message").value("Name is required field"));
+
     }
 
     @Test
